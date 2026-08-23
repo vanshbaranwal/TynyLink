@@ -1,15 +1,22 @@
 import { getShortUrl } from "../dao/shortUrl.js";
-import { createShortUrlWithoutUser } from "../services/shortUrl.service.js";
+import { createShortUrlWithoutUser, createShortUrlWithUser } from "../services/shortUrl.service.js";
 import { generateNanoId } from "../utils/helper.js";
 import wrapAsync from "../utils/trycatchWrapper.js";
 
 
 export const createShortUrl = wrapAsync(async (req, res) => {
-    const {url} = req.body;
+    const data = req.body;
+    let shortUrl;
+
+    if(req.user){
+        shortUrl = await createShortUrlWithUser(data.url, req.user._id, data.slug);
+    } else{
+        shortUrl = await createShortUrlWithoutUser(data.url);
+    }
     
-    const shortUrl = await createShortUrlWithoutUser(url);
     res.status(200).json({ shortUrl: process.env.APP_URL + shortUrl });
 });
+
 
 export const redirectFromShortUrl = wrapAsync(async(req, res) => {
     const { id } = req.params;
@@ -17,4 +24,10 @@ export const redirectFromShortUrl = wrapAsync(async(req, res) => {
 
     if(!url) throw new Error("short url not found")
     res.redirect(url.full_url);
+});
+
+export const createCustomShortUrl = wrapAsync(async(req, res) => {
+    const { url, slug } = req.body;
+    const shortUrl = await createShortUrlWithoutUser(url, customUrl);
+    res.status(200).json({ shortUrl: process.env.APP_URL + shortUrl }); 
 });

@@ -1,12 +1,14 @@
 import express from "express";
-import { nanoid } from "nanoid"
 import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import { nanoid } from "nanoid"
 import connectDB from "./src/config/mongo.config.js";
 import short_url from "./src/routes/shortUrl.route.js";
 import auth_routes from "./src/routes/auth.route.js";
 import { redirectFromShortUrl } from "./src/controller/shortUrl.controller.js";
 import { errorHandler } from "./src/utils/errorHandler.js";
-import cors from "cors";
+import { attachUser } from "./src/utils/attachUser.js";
 
 
 dotenv.config("./.env");
@@ -16,7 +18,9 @@ app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+app.use(attachUser);
 
 app.use("/api/auth", auth_routes);
 app.use("/api/create", short_url);
