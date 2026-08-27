@@ -10,7 +10,7 @@ export const registerUser = async(name, email, password) => {
 
     const newUser = await createUser(name, email, password);
     const token = signToken({ id: newUser._id });
-    return token;
+    return { token, user };
 };
 
 export const loginUser = async(email, password) => {
