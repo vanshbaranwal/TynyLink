@@ -1,7 +1,9 @@
 import User from "../models/user.model.js";
 
-export const findUserByEmail = async(email) => {
-    return await User.findOne({ email });
+export const findUserByEmail = async (email, includePassword = false) => {
+    const query = User.findOne({ email });
+    if (includePassword) query.select("+password");
+    return await query;
 };
 
 export const findUserById = async(id) => {

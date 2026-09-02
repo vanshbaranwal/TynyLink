@@ -28,6 +28,6 @@ export const logout_user = wrapAsync(async (req, res) => {
 });
 
 
-export const get_current_user = wrapAsync(async (req, req) => {
+export const get_current_user = wrapAsync(async (req, res) => {
     res.status(200).json({ user: req.user });
 });
