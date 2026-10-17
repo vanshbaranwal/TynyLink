@@ -115,33 +115,46 @@ export default function UrlForm({ user, authStatus, authVersion, onAuthNeeded, o
 
   return (
     <div className="shortener-card">
-      <form onSubmit={handleSubmit} noValidate aria-busy={isLoading}>
-        <label htmlFor="long-url">Your long URL</label>
-        <div className={`url-control${error?.field === 'url' ? ' has-error' : ''}`}>
-          <svg className="url-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M10.6 13.4a4 4 0 0 0 5.66 0l2.12-2.12a4 4 0 0 0-5.66-5.66L11.5 6.84" />
-            <path d="M13.4 10.6a4 4 0 0 0-5.66 0l-2.12 2.12a4 4 0 0 0 5.66 5.66l1.22-1.22" />
-          </svg>
-          <input
-            ref={urlRef}
-            id="long-url"
-            name="url"
-            type="url"
-            value={url}
-            onChange={(event) => {
-              setUrl(event.target.value)
-              if (error) setError(null)
-            }}
-            placeholder="https://example.com/your-long-link"
-            autoComplete="url"
-            autoCapitalize="none"
-            spellCheck="false"
-            aria-describedby={error?.field === 'url' ? 'url-hint url-error' : 'url-hint'}
-            aria-invalid={error?.field === 'url'}
-            disabled={isLoading}
-          />
+      <div className="card-heading">
+        <div>
+          <span className="card-kicker">Your short-link workspace</span>
+          <h2>Shorten a link</h2>
+          <p>Paste any web address and get a share-ready link in seconds.</p>
         </div>
-        <p className="url-hint" id="url-hint">Paste your link here — no need to include https://</p>
+      </div>
+
+      <form onSubmit={handleSubmit} noValidate aria-busy={isLoading}>
+        <div className="field-group">
+          <div className="field-heading">
+            <label htmlFor="long-url">Your long URL</label>
+            <span>Required</span>
+          </div>
+          <div className={`url-control${error?.field === 'url' ? ' has-error' : ''}`}>
+            <svg className="url-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M10.6 13.4a4 4 0 0 0 5.66 0l2.12-2.12a4 4 0 0 0-5.66-5.66L11.5 6.84" />
+              <path d="M13.4 10.6a4 4 0 0 0-5.66 0l-2.12 2.12a4 4 0 0 0 5.66 5.66l1.22-1.22" />
+            </svg>
+            <input
+              ref={urlRef}
+              id="long-url"
+              name="url"
+              type="url"
+              value={url}
+              onChange={(event) => {
+                setUrl(event.target.value)
+                if (error) setError(null)
+              }}
+              placeholder="https://example.com/your-long-link"
+              autoComplete="url"
+              autoCapitalize="none"
+              spellCheck="false"
+              aria-describedby={error?.field === 'url' ? 'url-hint url-error' : 'url-hint'}
+              aria-invalid={error?.field === 'url'}
+              disabled={isLoading}
+            />
+          </div>
+          <p className="url-hint" id="url-hint">No https://? No problem — we’ll add it for you.</p>
+        </div>
 
         {user ? (
           <div className="custom-option">
@@ -175,26 +188,39 @@ export default function UrlForm({ user, authStatus, authVersion, onAuthNeeded, o
           </div>
         ) : (
           <div className="custom-gate">
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="5" y="10" width="14" height="11" rx="3" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
-            </svg>
+            <span className="gate-icon">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="5" y="10" width="14" height="11" rx="3" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3M12 15v2" />
+              </svg>
+            </span>
             <div>
-              <span>Want a custom name?</span>
-              <p>{authStatus === 'checking' ? 'Checking your session…' : 'Create a free account to make it yours.'}</p>
+              <span>Make the link yours</span>
+              <p>{authStatus === 'checking' ? 'Checking your session…' : 'Sign up free to choose a custom name.'}</p>
             </div>
             <button type="button" className="text-button" onClick={() => onAuthNeeded('signup')} disabled={authStatus === 'checking' || isLoading}>Sign up</button>
           </div>
         )}
 
         <button className="shorten-button" type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <span className="button-spinner" aria-hidden="true" />
+          ) : (
+            <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="M8 6.5H6.5a3.5 3.5 0 1 0 0 7H8m4-7h1.5a3.5 3.5 0 1 1 0 7H12M7.5 10h5" />
+            </svg>
+          )}
           <span>{isLoading ? 'Shortening…' : 'Shorten URL'}</span>
-          {!isLoading && <span aria-hidden="true">↗</span>}
+          {!isLoading && (
+            <svg className="button-arrow" aria-hidden="true" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10h11M11 6l4 4-4 4" />
+            </svg>
+          )}
         </button>
       </form>
 
       <div className="form-status" aria-live="polite">
-        {error && <p className="error-message" id="url-error">{error.message}</p>}
+        {error && <p className="error-message" id="url-error" role="alert">{error.message}</p>}
 
         {shortUrl && (
           <ShortLinkResult shortUrl={shortUrl} copied={copied} onCopy={copyShortUrl} onReset={resetForm} resultRef={resultRef} />

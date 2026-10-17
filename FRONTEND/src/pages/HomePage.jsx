@@ -12,6 +12,14 @@ function LinkIcon() {
   )
 }
 
+function ArrowIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <path d="M4 10h11M11 6l4 4-4 4" />
+    </svg>
+  )
+}
+
 export default function HomePage() {
   const auth = useAuth()
   const [authMode, setAuthMode] = useState(null)
@@ -31,10 +39,14 @@ export default function HomePage() {
           <span className="brand-mark"><LinkIcon /></span>
           <span>TynyLink</span>
         </a>
+        <span className="header-note">Short links, thoughtfully made.</span>
         <nav className="header-actions" aria-label="Account">
           {auth.user ? (
             <>
-              <span className="account-name" title={auth.user.email}>Hi, {auth.user.name || auth.user.email}</span>
+              <span className="account-chip" title={auth.user.email}>
+                <span className="account-avatar" aria-hidden="true">{(auth.user.name || auth.user.email || 'U').charAt(0).toUpperCase()}</span>
+                <span className="account-name">{auth.user.name || auth.user.email}</span>
+              </span>
               <button className="header-button" type="button" onClick={auth.handleSignOut} disabled={auth.isSigningOut}>{auth.isSigningOut ? 'Signing out…' : 'Sign out'}</button>
             </>
           ) : (
@@ -64,28 +76,45 @@ export default function HomePage() {
               Turn your long URL into a clean, shareable link in seconds.
               No sign-up needed for a random short link.
             </p>
+            <div className="link-preview" aria-label="Example of a shortened link">
+              <div className="preview-url">
+                <span>Before</span>
+                <p>example.com/articles/a-very-long-link</p>
+              </div>
+              <span className="preview-arrow"><ArrowIcon /></span>
+              <div className="preview-url preview-url-short">
+                <span>After</span>
+                <p>tyny.link/hello</p>
+              </div>
+            </div>
           </div>
           <UrlForm user={auth.user} authStatus={auth.status} authVersion={authVersion} onAuthNeeded={openAuth} onSessionExpired={auth.expireSession} />
         </section>
 
-        <section className="steps" aria-label="How it works">
+        <section className="steps" aria-labelledby="steps-title">
+          <div className="steps-heading">
+            <span className="section-kicker">A cleaner way to share</span>
+            <h2 id="steps-title">From long to memorable in three steps.</h2>
+          </div>
+          <div className="steps-grid">
           <article>
             <span className="step-number">01</span>
-            <div><h2>Paste your link</h2><p>Drop in any long URL you want to make easier to share.</p></div>
+            <div><h3>Paste your link</h3><p>Drop in any web address. We validate it before creating your link.</p></div>
           </article>
           <article>
             <span className="step-number">02</span>
-            <div><h2>Make it short</h2><p>We turn it into a compact link with one quick click.</p></div>
+            <div><h3>Personalize it</h3><p>Use a random name, or sign in to choose a custom one.</p></div>
           </article>
           <article>
             <span className="step-number">03</span>
-            <div><h2>Share anywhere</h2><p>Copy your new link and send it wherever it needs to go.</p></div>
+            <div><h3>Share anywhere</h3><p>Copy the complete short URL and send it wherever it needs to go.</p></div>
           </article>
+          </div>
         </section>
       </main>
 
       <footer>
-        <p>Made for links that are too long.</p>
+        <p>Built for cleaner, more confident sharing.</p>
         <p>TynyLink · {new Date().getFullYear()}</p>
       </footer>
       {authMode && <AuthDialog initialMode={authMode} onClose={() => setAuthMode(null)} onAuthenticated={handleAuthenticated} />}
